@@ -203,6 +203,34 @@ def create_button(name: str, parent: str, text: str):  # text current placeholde
     print_success(f"Created Button: {name} (with label '{text}')")
 
 
+@ui.command("dump")
+@click.argument("asset_path", required=False)
+@click.option(
+    "--max-depth", "-d",
+    default=10,
+    type=int,
+    help="Maximum element depth to traverse."
+)
+@handle_unity_errors
+def dump(asset_path: Optional[str], max_depth: int):
+    """Dump UI Toolkit element tree structure.
+
+    In Edit Mode, provide the project-relative path to a .uxml asset.
+    In Play Mode, all active UIDocuments are dumped automatically.
+
+    \b
+    Examples:
+        unity-mcp ui dump Assets/UI/HUD.uxml
+        unity-mcp ui dump Assets/UI/HUD.uxml --max-depth 5
+    """
+    config = get_config()
+    params: dict = {"max_depth": max_depth}
+    if asset_path:
+        params["asset_path"] = asset_path
+    result = run_command("dump_ui", params, config)
+    click.echo(format_output(result, config.format))
+
+
 @ui.command("create-image")
 @click.argument("name")
 @click.option(
